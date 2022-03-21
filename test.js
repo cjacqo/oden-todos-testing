@@ -393,8 +393,6 @@ const ModalsController = (function() {
         return formControlArr
     }
 
-    function _checkModalIsOpen(type) {}
-
     function _handleClose() {
         const { type, elements } = _currentModal[0]
         _currentModal = null
@@ -405,16 +403,6 @@ const ModalsController = (function() {
         _modalOpen = true
     }
 
-    function _toggleModal(type) {
-        _currentModal = _currentModal !== type ? type : null
-
-        if (_currentModal) {
-            const theForm = _modalElements.filter(el => {return el.type === type})
-            console.log(theForm)
-        } 
-        
-    }
-    
     const _init = (function() {
         const todoModel       = ToDo()
         const noteModel       = Note()
@@ -453,18 +441,7 @@ const ModalsController = (function() {
         } else {
             _handleOpen(itemType)
         }
-        console.log(_currentModal)
-
-
-        // if (_currentModal[0].type === itemType) {
-        //     console.log("Hi")
-        //     _handleClose()
-        // } else if (_currentModal || _currentModal === itemType) {
-        //     console.log("Hi")
-        //     _handleClose()
-        // } else if (!_currentModal || _currentModal !== itemType) {
-        //     _handleOpen(itemType)
-        // }
+        return
     }
 
     return {
