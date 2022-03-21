@@ -1,0 +1,37 @@
+.flex {
+    display: flex;
+}
+.flex.col {
+    flex-direction: column;
+}
+
+/* === DATABASE TABLE === */
+.table-parent {
+    display: flex;
+    overflow: hidden;
+}
+
+.folders-container,
+.database-table-container {
+    flex: 1 0 auto;
+    height: 500px;
+    width: 100%;
+    transition: opacity 250ms ease-out;
+}
+.folders-container {
+    transform: translateX(0);
+    background-color: blue;
+}
+.database-container {
+    transform: translateX(-100%);
+    background-color: red;
+}
+
+.folders-container.toggle-out {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+.database-container.toggle-out {
+    transform: translateX(100%);
+    opacity: 0;
+}
