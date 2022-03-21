@@ -340,12 +340,13 @@ const ActionsController = (function() {
 })()
 //          + Modal View Controller
 const ModalsController = (function() {
-    const _modalContainer = document.createElement('div')
-    let _currentModal     = null
-    let _modalOpen        = false
-    let _modalTypes       = DatabaseView.getTables()
-    let _modalElements    = []
-    const _modalObj       = { type: String, element: Element }
+    const _modalContainer  = document.createElement('div')
+    let _contentContainer
+    let _currentModal      = null
+    let _modalOpen         = false
+    let _modalTypes        = DatabaseView.getTables()
+    let _modalElements     = []
+    const _modalObj        = { type: String, element: Element }
 
     function _createModalElements(configObj, className) {
         let formControlArr = []
@@ -363,6 +364,9 @@ const ModalsController = (function() {
                     tempInput.setAttribute('value', option)
                     tempInput.setAttribute('name', key)
                     tempLabel.innerText = option
+                    tempInput.addEventListener('click', (e) => {
+                        e.stopPropagation()
+                    })
                     container.appendChild(tempLabel)
                     container.appendChild(tempInput)
                 })
@@ -373,6 +377,9 @@ const ModalsController = (function() {
                 tempInput.setAttribute('type', value.type)
                 tempInput.setAttribute('name', key)
                 tempLabel.innerText = key.charAt(0).slice(1).toUpperCase()
+                tempInput.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                })
                 container.appendChild(tempLabel)
                 container.appendChild(tempInput)
             }
@@ -384,21 +391,27 @@ const ModalsController = (function() {
         return formControlArr
     }
 
-    function _handleClose(type) {
-        let fieldSet = _currentModal[0].elements
+    function _handleClose() {
         _modalContainer.classList.toggle('closed-modal')
-        _modalContainer.removeChild(fieldSet)
+        _modalContainer.removeChild(_contentContainer)
         _currentModal = null
         _modalOpen = false
     }
     function _handleOpen(type) {
         _currentModal = _modalElements.filter(el => {return el.type === type})
         _modalOpen = true
-        _modalContainer.appendChild(_currentModal[0].elements)
         _toggleModal()
     }
     function _toggleModal() {
         _modalContainer.classList.toggle('closed-modal')
+    }
+    function _render(action) {
+        if (action === 'add-item') {
+            _contentContainer = document.createElement('form')
+            _contentContainer.classList.add('modal-content-wrapper')
+            _contentContainer.appendChild(_currentModal[0].elements)
+            _modalContainer.appendChild(_contentContainer)
+        }
     }
 
     const _init = (function() {
@@ -428,6 +441,12 @@ const ModalsController = (function() {
             _modalElements.push({type: modalType, elements: fieldSet})
         })
         _modalContainer.classList.add('modal-container', 'closed-modal')
+        _modalContainer.addEventListener('click', (e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+            _handleClose()
+        })
         const content = document.getElementById('content')
         content.appendChild(_modalContainer)
     })()
@@ -443,7 +462,7 @@ const ModalsController = (function() {
         } else {
             _handleOpen(itemType)
         }
-        console.log(_currentModal)
+        _render(action)
         return
     }
 
