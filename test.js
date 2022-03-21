@@ -357,13 +357,14 @@ const ModalsController = (function() {
 
             if (value.options) {
                 value.options.forEach(option => {
+                    console.log(option)
                     let tempLabel = label
                     let tempInput = input
                     tempLabel.setAttribute('for', value.option)
                     tempInput.setAttribute('type', value.type)
                     tempInput.setAttribute('value', option)
                     tempInput.setAttribute('name', key)
-                    tempLabel.innerText = option
+                    tempLabel.innerHTML = key
                     tempInput.addEventListener('click', (e) => {
                         e.stopPropagation()
                     })
@@ -376,7 +377,7 @@ const ModalsController = (function() {
                 tempLabel.setAttribute('for', key)
                 tempInput.setAttribute('type', value.type)
                 tempInput.setAttribute('name', key)
-                tempLabel.innerText = key.charAt(0).slice(1).toUpperCase()
+                tempLabel.innerText = key
                 tempInput.addEventListener('click', (e) => {
                     e.stopPropagation()
                 })
