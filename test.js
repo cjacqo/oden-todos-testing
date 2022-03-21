@@ -27,31 +27,52 @@ function createItemObject(value) {
 }
 
 // MODELS
+/* --- Database Items */
 const Item = (title) => {
-    const getTitle = () => {return title}
-    return {getTitle}
+    const getTitle    = () => {return title}
+    let inputConfig = {
+        title: {type: 'text'}
+    }
+    return {getTitle, inputConfig}
 }
 
 const ToDo = (title, duedate, num) => {
-    const {getTitle}    = Item(title)
-    const priority      = ['low', 'high']
-    const getDueDate    = () => {return duedate}
-    const getPriority   = () => { if (!num) {return} return priority[num] }
-    return {getTitle, getDueDate, getPriority}
+    const {getTitle}     = Item(title)
+    const _priority      = ['low', 'high']
+    const getDueDate     = () => {return duedate}
+    const getPriority    = () => { if (!num) {return} return _priority[num] }
+    const getInputConfig = () => {
+        let temp = Item().inputConfig
+        temp.duedate  = {type: 'date'}
+        temp.priority = {type: 'checkbox', options: _priority}
+        return temp
+    }
+    return {getTitle, getDueDate, getPriority, getInputConfig}
 }
 
 const Note = (title, text) => {
     const {getTitle}    = Item(title)
     const getText       = () => {return text}
-    return {getTitle, getText}
+    const getInputConfig = () => {
+        let temp  = Item().inputConfig
+        temp.text = {type: 'textarea'}
+        return temp
+    }
+    return {getTitle, getText, getInputConfig}
 }
 
-const CheckList = (title, items) => {
+const CheckList = (title, items, quantity) => {
     const {getTitle}    = Item(title)
     const getItems      = () => {return items}
+    const getQuantity   = () => {return getItems().length}
     const getIncomplete = () => {return items.filter(item => item.getComplete === false)}
     const checkComplete = () => {return getIncomplete.length > 0}
-    return {getTitle, getItems, getIncomplete, checkComplete}
+    const getInputConfig = () => {
+        let temp       = Item().inputConfig
+        temp.quantity  = {type: 'number'}
+        return temp
+    }
+    return {getTitle, getItems, getQuantity, getIncomplete, checkComplete, getInputConfig}
 }
 
 const CheckListItem = (text) => {
@@ -69,12 +90,43 @@ const Folder = (title, items) => {
     return {getTitle, getItems, getDateCreated}
 }
 
+/* --- Database Tables */
 const DatabaseModel = (tables) => {
     const arr = []
     for (let i = 0; i < tables; i++) {
         arr[i] = []
     }
     return arr
+}
+
+/* --- Modal */
+const Modal = (type) => {
+    const getType = () => {return type}
+    const getForm = (questions) => {
+        const formContainer = document.createElement('div')
+        const formElement   = document.createElement('form')
+        formContainer.classList.add('modal-container')
+        questions.forEach(question => {
+            formElement.appendChild(question)
+        })
+        formContainer.appendChild(formElement)
+        return formContainer
+    }
+    return {getType, getForm}
+}
+
+const ToDoModal = (title) => {
+    const elements = []
+    const inputs = () => {
+        const titleInput    = document.createElement('input')
+        const dueDateInput  = document.createElement('input')
+        const priorityInput = document.createElement('input')
+    }
+}
+
+const FormModal = (title) => {
+    const {getTitle}    = Modal(title)
+    return {getTitle}
 }
 
 // CONTROLLERS
@@ -135,7 +187,6 @@ const Database = (function() {
         handleAction: handleAction
     }
 })()
-
 //          + Database View Controller
 const DatabaseView = (function() {
     let _currentView
@@ -217,7 +268,6 @@ const DatabaseView = (function() {
         render: render
     }
 })()
-
 //          + Actions View Controller
 const ActionsController = (function() {
     let _details    = { type: String, actions: [] }
@@ -250,9 +300,12 @@ const ActionsController = (function() {
                     return
                 case 'add-item':
                     btn.addEventListener('click', (e) => {
-                        const value = e.target.value
-                        const createdObject = createItemObject(value)
-                        Database.handleAction(createdObject, e)
+                        const value  = e.target.value
+                        const action = e.target.name
+                        ModalsController.handleSelection(value, action)
+                        //@TEST
+                        // const createdObject = createItemObject(value)
+                        // Database.handleAction(createdObject, e)
                     })
                     return
                 case 'delete':
@@ -293,6 +346,130 @@ const ActionsController = (function() {
         getContainer: getContainer
     }
     
+})()
+//          + Modal View Controller
+const ModalsController = (function() {
+    const _modalContainer = document.createElement('div')
+    let _currentModal     = null
+    let _modalOpen        = false
+    let _modalTypes       = DatabaseView.getTables()
+    let _modalElements    = []
+    const _modalObj       = { type: String, element: Element }
+
+    function _createModalElements(configObj, className) {
+        let formControlArr = []
+        for (const [key, value] of Object.entries(configObj)) {
+            const container   = document.createElement('div')
+            const label       = document.createElement('label')
+            const input       = document.createElement('input')
+
+            if (value.options) {
+                value.options.forEach(option => {
+                    let tempLabel = label
+                    let tempInput = input
+                    tempLabel.setAttribute('for', value.option)
+                    tempInput.setAttribute('type', value.type)
+                    tempInput.setAttribute('value', option)
+                    tempInput.setAttribute('name', key)
+                    tempLabel.innerText = option
+                    container.appendChild(tempLabel)
+                    container.appendChild(tempInput)
+                })
+            } else {
+                let tempLabel = label
+                let tempInput = input
+                tempLabel.setAttribute('for', key)
+                tempInput.setAttribute('type', value.type)
+                tempInput.setAttribute('name', key)
+                tempLabel.innerText = key.charAt(0).slice(1).toUpperCase()
+                container.appendChild(tempLabel)
+                container.appendChild(tempInput)
+            }
+            container.classList.add(`form-control` ,`${className}-form-control`)
+            input.classList.add(`modal-input`, `${className}-input`)
+            input.setAttribute('type', `${value.type}`)
+            formControlArr.push(container)
+        }
+        return formControlArr
+    }
+
+    function _checkModalIsOpen(type) {}
+
+    function _handleClose() {
+        const { type, elements } = _currentModal[0]
+        _currentModal = null
+        _modalOpen = false
+    }
+    function _handleOpen(type) {
+        _currentModal = _modalElements.filter(el => {return el.type === type})
+        _modalOpen = true
+    }
+
+    function _toggleModal(type) {
+        _currentModal = _currentModal !== type ? type : null
+
+        if (_currentModal) {
+            const theForm = _modalElements.filter(el => {return el.type === type})
+            console.log(theForm)
+        } 
+        
+    }
+    
+    const _init = (function() {
+        const todoModel       = ToDo()
+        const noteModel       = Note()
+        const checklistModel  = CheckList()
+        const todoConfig      = todoModel.getInputConfig()
+        const noteConfig      = noteModel.getInputConfig()
+        const checklistConfig = checklistModel.getInputConfig()
+        _modalTypes.forEach(modalType => {
+            let formControls = []
+            const fieldSet = document.createElement('fieldset')
+            fieldSet.classList.add('form-controls-container', `${modalType}-form-controls-container`)
+            if (modalType === 'todo') {
+                formControls = _createModalElements(todoConfig, modalType)
+            }
+            if (modalType === 'note') {
+                formControls = _createModalElements(noteConfig, modalType)
+            }
+            if (modalType === 'checklist') {
+                formControls = _createModalElements(checklistConfig, modalType)
+            }
+            formControls.forEach(cntrl => {
+                fieldSet.appendChild(cntrl)
+            })
+            _modalElements.push({type: modalType, elements: fieldSet})
+        })
+    })()
+
+    function handleSelection(itemType, action) {
+        if (_modalOpen) {
+            if (_currentModal[0].type === itemType) {
+                _handleClose()
+            } else {
+                _handleClose()
+                _handleOpen(itemType)
+            }
+        } else {
+            _handleOpen(itemType)
+        }
+        console.log(_currentModal)
+
+
+        // if (_currentModal[0].type === itemType) {
+        //     console.log("Hi")
+        //     _handleClose()
+        // } else if (_currentModal || _currentModal === itemType) {
+        //     console.log("Hi")
+        //     _handleClose()
+        // } else if (!_currentModal || _currentModal !== itemType) {
+        //     _handleOpen(itemType)
+        // }
+    }
+
+    return {
+        handleSelection: handleSelection
+    }
 })()
 
 // ELEMENTS
@@ -341,7 +518,18 @@ const tableElement = (tableArr, tableIndex, tableType) => {
     return tableContainer
 }
 //          + Folder Element
-const folderElement = () => {
+const folderElement = (name, value, title) => {
+    const button = document.createElement('button')
+    button.classList.add('folder-element-button')
+    button.setAttribute('name', name)
+    button.addEventListener('click', (e) => {
+        console.log("Folder Clicked")
+    })
+    return button
+}
+//          + Form Element
+const formElement = () => {
+    const formContainer = document.createElement('form')
 
 }
 
