@@ -115,15 +115,6 @@ const Modal = (type) => {
     return {getType, getForm}
 }
 
-const ToDoModal = (title) => {
-    const elements = []
-    const inputs = () => {
-        const titleInput    = document.createElement('input')
-        const dueDateInput  = document.createElement('input')
-        const priorityInput = document.createElement('input')
-    }
-}
-
 const FormModal = (title) => {
     const {getTitle}    = Modal(title)
     return {getTitle}
@@ -393,14 +384,21 @@ const ModalsController = (function() {
         return formControlArr
     }
 
-    function _handleClose() {
-        const { type, elements } = _currentModal[0]
+    function _handleClose(type) {
+        let fieldSet = _currentModal[0].elements
+        _modalContainer.classList.toggle('closed-modal')
+        _modalContainer.removeChild(fieldSet)
         _currentModal = null
         _modalOpen = false
     }
     function _handleOpen(type) {
         _currentModal = _modalElements.filter(el => {return el.type === type})
         _modalOpen = true
+        _modalContainer.appendChild(_currentModal[0].elements)
+        _toggleModal()
+    }
+    function _toggleModal() {
+        _modalContainer.classList.toggle('closed-modal')
     }
 
     const _init = (function() {
@@ -414,6 +412,7 @@ const ModalsController = (function() {
             let formControls = []
             const fieldSet = document.createElement('fieldset')
             fieldSet.classList.add('form-controls-container', `${modalType}-form-controls-container`)
+            fieldSet.setAttribute('id', `${modalType}FieldSet`)
             if (modalType === 'todo') {
                 formControls = _createModalElements(todoConfig, modalType)
             }
@@ -428,6 +427,9 @@ const ModalsController = (function() {
             })
             _modalElements.push({type: modalType, elements: fieldSet})
         })
+        _modalContainer.classList.add('modal-container', 'closed-modal')
+        const content = document.getElementById('content')
+        content.appendChild(_modalContainer)
     })()
 
     function handleSelection(itemType, action) {
@@ -441,6 +443,7 @@ const ModalsController = (function() {
         } else {
             _handleOpen(itemType)
         }
+        console.log(_currentModal)
         return
     }
 
