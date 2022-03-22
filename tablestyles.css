@@ -24,7 +24,7 @@
 }
 
 .list-container > * {
-    flex: 1 0 35px;
+    flex: 1 0 45px;
     padding: var(--x-small) calc(var(--small) + 3px);
     justify-content: flex-start;
     align-items: center;
@@ -37,6 +37,12 @@
     position: relative;
     top: 0;
     left: 0;
+    letter-spacing: 0.025rem;
+}
+
+.fa-folder {
+    font-weight: unset;
+    font-size: 1.42rem;
 }
 
 .right-container {
@@ -49,7 +55,7 @@
 .right-container::after {
     content: '';
     position: absolute;
-    top: calc(var(--x-small) * 2);
+    top: calc((var(--x-small) * 2) + 5px);
     right: calc((var(--x-small) * 2) * -1);
     width: calc(100% + (var(--x-small) * 2));
     height: 100%;
@@ -60,7 +66,12 @@
     flex: 0 1 auto;
 }
 
+.right-container .text-item {
+    font-size: 0.98rem;
+    font-weight: bold;
+}
+
 .right-container i {
     color: rgb(255,255,255,0.46);
-    font-size: var(--small);
+    font-size: calc(var(--normal) - 0.05rem);
 }

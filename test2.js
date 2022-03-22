@@ -342,11 +342,13 @@ const PageView = (function() {
             li.classList.add('flex')
             folderIcon.classList.add('fa-solid', 'fa-folder', 'accent-text')
             chevronIcon.classList.add('fa-solid', 'fa-chevron-right')
-            folderTitle.classList.add('text-item', 'secondary-text')
+            folderTitle.classList.add('text-item', 'main-text')
             rightContainer.classList.add('right-container', 'flex')
             folderIcon.classList.add('fa-solid', 'fa-folder')
 
-            folderTitle.innerText = data.getTitle()
+            const text = data.getTitle()
+
+            folderTitle.innerText = text.charAt(0).toUpperCase() + text.slice(1)
             // HERE IS WHERE THE COUNT OF ITEMS IN EACH FOLDER WILL BE APPENDED
             // folderItemCount.innerText = getData().length
 
