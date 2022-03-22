@@ -305,6 +305,12 @@ const PageView = (function() {
     let _footer
     let _modal
 
+    const _marginWrapper = () => {
+        const container = document.createElement('div')
+        container.classList.add('margin-wrapper')
+        return container        
+    }
+
     const _ListItem = (data, type) => {
         const getData = () => {return data}
         const getElement = () => {
@@ -353,36 +359,35 @@ const PageView = (function() {
             //          2) the back button navigation from previous page title (default class of hidden)
             _titleElement = _createTitleContainer()
             header.appendChild(_titleElement)
-            let parsedIndex = parseInt(_currentPageIndex)
             if (_currentPageIndex > 0 && _currentPageIndex < _pages.length) {
                 _navTitleElement = _createTitleContainer()
-                console.log(_currentPageIndex)
 
                 header.appendChild(_navTitleElement)
             }
-
-            // TEST @@@
-            let count = 0
-            _pages.forEach(p => {
-                let btn = document.createElement('button')
-                btn.setAttribute('id', `${p.page}`)
-                btn.setAttribute('value', `${count}`)
-                btn.setAttribute('name', `navigate`)
-                btn.setAttribute('type', `button`)
-                btn.innerText = p.page
-
-                btn.addEventListener('click', (e) => {
-                    let navigateToIndex = EventsController.handleNavigate(e.target.value)
-                    _currentPageTitle = _pages[navigateToIndex].page
-                    _currentPageIndex = navigateToIndex
-                    _HeaderView.renderHeader()
-                    console.log(_currentPageIndex)
-                })
-                count++
-                header.appendChild(btn)
-            })
-            
             _header = header
+
+        //     // TEST @@@
+        //     let count = 0
+        //     _pages.forEach(p => {
+        //         let btn = document.createElement('button')
+        //         btn.setAttribute('id', `${p.page}`)
+        //         btn.setAttribute('value', `${count}`)
+        //         btn.setAttribute('name', `navigate`)
+        //         btn.setAttribute('type', `button`)
+        //         btn.innerText = p.page
+
+        //         btn.addEventListener('click', (e) => {
+        //             let navigateToIndex = EventsController.handleNavigate(e.target.value)
+        //             _currentPageTitle = _pages[navigateToIndex].page
+        //             _currentPageIndex = navigateToIndex
+        //             _HeaderView.renderHeader()
+        //             console.log(_currentPageIndex)
+        //         })
+        //         count++
+        //         header.appendChild(btn)
+        //     })
+            
+        //     _header = header
         }
 
         function _createTitleContainer() {
@@ -451,7 +456,12 @@ const PageView = (function() {
         let _main
 
         function _createDisplay() {
-            _main.appendChild(_currentTable[0])
+            const marginWrapper = _marginWrapper()
+            marginWrapper.addEventListener('scroll', (e) => {
+                console.log(e.target.scrollTop)
+            }, {passive: true })
+            marginWrapper.appendChild(_currentTable[0])
+            _main.appendChild(marginWrapper)
         }
         
         function _createMainElement() {

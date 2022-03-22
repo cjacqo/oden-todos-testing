@@ -90,6 +90,12 @@ ul {
     overflow-y: scroll;
 }
 
+header,
+.margin-wrapper,
+footer {
+    padding: 0 var(--base-size);
+}
+
 /* === MODAL === */
 .modal-container {
     position: absolute;
