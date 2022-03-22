@@ -1,7 +1,53 @@
+:root {
+    /* SIZING */
+    --base-size: 14px;
+    --xxx-large: 11.089rem;
+    --xx-large: 6.854rem;
+    --x-large: 4.236rem;
+    --large: 2.618rem;
+    --husky: 1.618rem;
+    --normal: 1rem;
+    --small: 0.618rem;
+    --x-small: 0.382rem;
+    --xx-small: 0.236rem;
+    /* COLORS */
+    --white: rgb(255, 250, 255);
+    --black: rgb(38, 38, 38);
+    --grey-bg: rgb(71, 71, 71);
+    --grey-text: rgb(224, 224, 224);
+    --blue: rgb(34, 116, 165);
+    --yellow-1: rgb(246, 174, 45);
+    --yellow-2: rgb(246, 174, 40);
+    --purple: rgb(133, 71, 152);
+    --error-delete: rgb(223, 41, 53);
+}
 /* --- GLOBAL & RESETS --- */
 /* -                     -
    - -                 - -
    - - -             - - - */
+.main-text,
+.delete-color-secondary {
+    color: var(--white);
+}
+.secondary-text,
+.inactive {
+    color: var(--grey-text);
+}
+.accent-text,
+.pinned {
+    color: var(--yellow-1);
+}
+.ok-color {
+    color: var(--blue);
+}
+.locked {
+    color: var(--purple);
+}
+.error,
+.delete-color-primary {
+    color: var(--error-delete);
+}
+
 *,
 *::before,
 *::after {
@@ -12,7 +58,14 @@
 
 html,
 body {
+    font-size: 14px;
     height: 100%;
+}
+
+body {
+    background-color: rgb(10, 9, 9);
+    color: white;
+    font-family: sans-serif;
 }
 
 #content {
@@ -20,6 +73,8 @@ body {
     height: 100%;
     position: relative;
     overflow-y: hidden;
+    display: grid;
+    grid-template-rows: var(--xx-large) 1fr var(--xx-large);
 }
 
 .flex {
@@ -27,6 +82,24 @@ body {
 }
 .flex.col {
     flex-direction: column;
+}
+
+.header-container,
+.footer-container {
+    height: 100%;
+    backdrop-filter: blur(17px) saturate(32%);
+    -webkit-backdrop-filter: blur(17px) saturate(32%);
+    background-color: rgba(49, 52, 60, 0.71);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.125);
+}
+.header-container {
+    grid-col: 1 / 2;
+    grid-row: 1 / 2;
+}
+.footer-container {
+    grid-col: 1 / 2;
+    grid-row: 3 / 4;
 }
 
 /* === MODAL === */

@@ -119,10 +119,7 @@ const Modal = (type) => {
     return {getType, getForm}
 }
 
-const FormModal = (title) => {
-    const {getTitle}    = Modal(title)
-    return {getTitle}
-}
+/* --- Test */
 
 // CONTROLLERS
 //          + Database Controller
@@ -490,8 +487,13 @@ const ModalsController = (function() {
 
 // ELEMENTS
 //          + Container
-const containerElement = (classNames) =>  {
-    const container = document.createElement('div')
+const containerElement = (classNames, type) =>  {
+    let container
+    if (type) {
+        container = document.createElement(`${type}`)
+    } else {
+        container = document.createElement('div')
+    }
     classNames.forEach(name => {
         if (name === 'flex' || name === 'col') {
             container.classList.add(`${name}`)
@@ -500,6 +502,10 @@ const containerElement = (classNames) =>  {
         }
     })
     return container
+}
+//          + Buttons Container
+const buttonsContainer = (btns) => {
+    console.log(btns)
 }
 //          + Button
 const buttonElement = (title, actionType, value) => {
@@ -546,26 +552,75 @@ const folderElement = (name, value, title) => {
 //          + Form Element
 const formElement = () => {
     const formContainer = document.createElement('form')
-
 }
+//          + Text Box
+//         ~~ type          : string ? (h1, h3, p, small, etc.)
+//         ~~ className     : string ? text element class name
+const textBox = (type, className) => {
+    const textItem = document.createElement(`${type}`)
+    textItem.classList.add('text-item', `${className}`)
+    return textItem
+}
+//          + Page Header
+//         ~~ activeTable   : integer ? sets the text of the inner HTML from array
+//                                      based on the integer
+const pageHeader = (activeTable) => {
+    const titles = [`Folder`, 'Todo', 'Note', 'Checklist']
+    const header = document.createElement('header')
+    header.classList.add('header-container', 'flex')
+    // --- page title
+    const textElement = textBox('h1', 'page-title')
+    textElement.innerText = activeTable ? titles[activeTable] : 'All'
+    header.appendChild(textElement)
+    return header
+}
+//          + Page Footer
+const pageFooter = () => {
+    const footer = document.createElement('footer')
+    footer.classList.add('footer-container', 'flex')
+    const textItem = textBox('p', 'footer-counter-text')
+    footer.appendChild(textItem)
+    return footer
+}
+
 
 // MAIN IIFE FOR APP START
 const ToDoApp = (function() {
+    // --- Set Controllers
+    const _database = Database.getDatabase()
     const container = document.getElementById('content')
 
-    const p = document.createElement('p')
-    p.innerText = 'Hello'
-    container.appendChild(p)
+    // --- Functions to Initialize App
+    function _buildHeader() {
+        // const header = containerElement(['header', ])
+        const header = pageHeader()
+        // --- action controller
+        ActionsController.createActionController('toggle-views', DatabaseView.getViews())
+        ActionsController.createActionController('add-item', ['Folder', 'ToDo', 'Note', 'Checklist'])
+        const toggleControllerContainer     = ActionsController.getContainer(0)
+        const addItemsControllerContainer   = ActionsController.getContainer(1)
+        buttonsContainer(toggleControllerContainer)
+        header.appendChild(toggleControllerContainer)
+        header.appendChild(addItemsControllerContainer)
+        container.appendChild(header)
+    }
+    function _buildTableParent() {
+        container.appendChild(DatabaseView.getView())
+    }
+    function _buildFooter() {
+        const footer = pageFooter
+        container.appendChild(pageFooter())
+    }
 
-    // --- CREATE ELEMENTS VIA CONTROLLERS
-    //          + Action Controllers
-    ActionsController.createActionController('toggle-views', DatabaseView.getViews())
-    ActionsController.createActionController('add-item', ['Folder', 'ToDo', 'Note', 'Checklist'])
-    const toggleControllerContainer     = ActionsController.getContainer(0)
-    const addItemsControllerContainer   = ActionsController.getContainer(1)
-    
-    container.appendChild(toggleControllerContainer)
-    container.appendChild(addItemsControllerContainer)
-    // --- database table
-    container.appendChild(DatabaseView.getView())
+    function start() {
+        _buildHeader()
+        _buildTableParent()
+        _buildFooter()
+    }
+
+    return {
+        start: start
+    }
 })()
+
+ToDoApp.start()
