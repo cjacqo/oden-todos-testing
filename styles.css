@@ -12,8 +12,8 @@
     --xx-small: 0.236rem;
     /* COLORS */
     --white: rgb(255, 250, 255);
-    --black: rgb(38, 38, 38);
-    --grey-bg: rgb(71, 71, 71);
+    --black: rgb(26, 23, 23);
+    --grey-bg: rgb(37, 37, 37);
     --grey-text: rgb(224, 224, 224);
     --blue: rgb(34, 116, 165);
     --yellow-1: rgb(246, 174, 45);
@@ -90,10 +90,17 @@ ul {
     overflow-y: scroll;
 }
 
+.page-title {
+    font-weight: bold;
+}
+.text-item {
+    align-self: flex-end;
+}
+
 header,
 .margin-wrapper,
 footer {
-    padding: 0 var(--base-size);
+    padding: 0 1.15rem;
 }
 
 /* === MODAL === */

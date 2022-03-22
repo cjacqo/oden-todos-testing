@@ -289,8 +289,26 @@ const EventsController = (function() {
         return selectedIndex
     }
 
+    function handleScroll(scroll) {
+        let header = PageView.renderHeader()
+        let footer = PageView.renderFooter()
+        if (scroll >= 160) {
+            header.classList.add('glass-bg')
+        } 
+        if (scroll > 2200) {
+            footer.classList.remove('glass-bg')
+        }
+        if (scroll < 160) {
+            header.classList.remove('glass-bg')
+        }
+        if (scroll < 2200) {
+            footer.classList.add('glass-bg')
+        }
+    }
+
     return {
-        handleNavigate: handleNavigate
+        handleNavigate: handleNavigate,
+        handleScroll: handleScroll
     }
 })()
 
@@ -315,7 +333,28 @@ const PageView = (function() {
         const getData = () => {return data}
         const getElement = () => {
             const li = document.createElement('li')
-            li.innerText = data.getTitle()
+            const folderIcon  = document.createElement('i')
+            const rightContainer = document.createElement('div')
+            const folderTitle = document.createElement('p')
+            const folderItemCount = document.createElement('p')
+            const chevronIcon  = document.createElement('i')
+            
+            li.classList.add('flex')
+            folderIcon.classList.add('fa-solid', 'fa-folder', 'accent-text')
+            chevronIcon.classList.add('fa-solid', 'fa-chevron-right')
+            folderTitle.classList.add('text-item', 'secondary-text')
+            rightContainer.classList.add('right-container', 'flex')
+            folderIcon.classList.add('fa-solid', 'fa-folder')
+
+            folderTitle.innerText = data.getTitle()
+            // HERE IS WHERE THE COUNT OF ITEMS IN EACH FOLDER WILL BE APPENDED
+            // folderItemCount.innerText = getData().length
+
+            rightContainer.appendChild(folderTitle)
+            rightContainer.appendChild(folderItemCount)
+            rightContainer.appendChild(chevronIcon)
+            li.appendChild(folderIcon)
+            li.appendChild(rightContainer)
             return li
         }
         return {getData, getElement}
@@ -458,8 +497,9 @@ const PageView = (function() {
         function _createDisplay() {
             const marginWrapper = _marginWrapper()
             marginWrapper.addEventListener('scroll', (e) => {
-                console.log(e.target.scrollTop)
-            }, {passive: true })
+                e.stopPropagation()
+                EventsController.handleScroll(e.target.scrollTop)
+            })
             marginWrapper.appendChild(_currentTable[0])
             _main.appendChild(marginWrapper)
         }
@@ -517,7 +557,7 @@ const PageView = (function() {
         function _createFooterElement() {
             // --- create the parent container
             const footer = document.createElement('footer')
-            footer.classList.add('footer-container', 'flex')
+            footer.classList.add('footer-container', 'flex', 'glass-bg')
             // _createActionContainers()
             _footer = footer
         }
