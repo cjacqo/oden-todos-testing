@@ -150,7 +150,6 @@ const Database = (function() {
     let _objectFormInputsModel
 
     const _init = (function() {
-        _db             = {folders: [], items: []}
         _folders        = []
         _items          = {todos: [], notes: [], checklists: []}
         const defaultFolders = ['all', 'todos', 'notes', 'checklists']
@@ -162,13 +161,26 @@ const Database = (function() {
             }
             _folders.push(temp)
         })
+
+        _testInsertFolder(80)
+        
         _objectFormInputsModel   = {
             folder: ItemInputs('folder'),
             todo: ItemInputs('todo', [{type: 'date', quesiton: 'duedate'}, {type: 'radio', question: 'priority', options: ['low', 'high']}]), 
             note: ItemInputs('note', [{type: 'textarea', question: 'note'}]), 
             checklist: ItemInputs('checklist')
         }
+
+        _db = {folders: _folders, items: _items, pinned: []}
+        console.log(_db)
     })()
+
+    function _testInsertFolder(n) {
+        for (let i = 0; i < n; i++) {
+            let testDisplayFolders = FolderObject(`Test Folder ${i}`, true)
+            _folders.push(testDisplayFolders)
+        }
+    }
 
     function _grabTable(type) {
         switch(type) {
@@ -197,6 +209,7 @@ const Database = (function() {
     function _editItem(payload) {console.log("EDIT ITEM")}
     function _findItem(payload) {console.log("FIND ITEM")}
 
+    function getDb() {return _db}
     function getDatabase(type) {return _grabTable(type)}
     function getFolders() {return _folders}
     function getObjectInputModels() {return _objectFormInputsModel}
@@ -221,6 +234,7 @@ const Database = (function() {
     }
 
     return {
+        getDb: getDb,
         getDatabase: getDatabase,
         getFolders: getFolders,
         getObjectInputModels: getObjectInputModels,
@@ -245,8 +259,29 @@ const ActionController = (function() {
 })()
 // --- Data Controller
 const DataController = (function() {
-    let _tables
+    let _theDatabase
 
+    const _init = (function() {
+        _theDatabase = Database.getDb()
+    })()
+
+    function getTheDatabases() {return _theDatabase}
+
+    function getTables() {
+        const {folders, items: { todos, notes, checklists }, pinned} = _theDatabase
+        return {folders, todos, notes, checklists, pinned}
+    }
+    
+    function handleDataChange() {
+        console.log('Handle Data Change')
+    }
+
+    
+    return {
+        getTheDatabases: getTheDatabases,
+        getTables: getTables,
+        handleDataChange: handleDataChange
+    }
 })()
 // --- Events Controller
 const EventsController = (function() {
@@ -269,6 +304,32 @@ const PageView = (function() {
     let _main
     let _footer
     let _modal
+
+    const _ListItem = (data, type) => {
+        const getData = () => {return data}
+        const getElement = () => {
+            const li = document.createElement('li')
+            li.innerText = data.getTitle()
+            return li
+        }
+        return {getData, getElement}
+    }
+
+    const _ListContainer = (table, id) => {
+        const getType = () => {return id}
+        const getData = () => {return table}
+        const getElement = () => {
+            const ul = document.createElement('ul')
+            ul.classList.add('list-container')
+            ul.setAttribute('id', `${id}Table`)
+            table.forEach(item => {
+                let li = _ListItem(item).getElement()
+                ul.appendChild(li)
+            })
+            return ul
+        }
+        return {getType, getData, getElement}
+    }
 
     // --- Header View
     //          + creates elements for...
@@ -385,25 +446,46 @@ const PageView = (function() {
     //          + Handles the main content displayed on the page
     const _MainView = (function() {
         let _currentPage
+        let _tableElements = []
+        let _currentTable
         let _main
 
+        function _createDisplay() {
+            _main.appendChild(_currentTable[0])
+        }
+        
         function _createMainElement() {
             const main = document.createElement('main')
             main.classList.add('main-container', 'flex', 'col')
+            const table = _tableElements.filter(_tb => {
+                return _tb.id.includes(_currentPage)
+            })
+            _currentTable = table
+            _main = main
         }
 
         function _createTableElements() {
-            // NEEDS TO CREATE FIVE TABLE CONTAINERS
-            //    1) Database   : Folders
-            //    2) Items      : ToDos
-            //    3) Items      : Notes
-            //    4) Items      : CheckLists
-            //    5) Pinned     : Pinned Items
+            const tempDataObjects = DataController.getTables()
+            const {folders, todos, notes, checklists, pinned} = tempDataObjects
+
+            let foldersTable = _ListContainer(folders, 'folders').getElement()
+            let todosTable = _ListContainer(todos, 'todos').getElement()
+            let notesTable = _ListContainer(notes, 'notes').getElement()
+            let checkListsTable = _ListContainer(checklists, 'checklists').getElement()
+            let pinnedTable = _ListContainer(pinned, 'pinned').getElement()
+
+            _tableElements.push(foldersTable)
+            _tableElements.push(todosTable)
+            _tableElements.push(notesTable)
+            _tableElements.push(checkListsTable)
+            _tableElements.push(pinnedTable)
         }
 
         function renderMain() {
             _currentPage = getCurrentPageTitle()[0]
+            _createTableElements()
             _createMainElement()
+            _createDisplay()
             return _main
         }
         
@@ -471,6 +553,7 @@ const PageView = (function() {
     }
     function getPages() {return _pages}
     function renderHeader() {return _header}
+    function renderMain() {return _main}
     function renderFooter() {return _footer}
 
     return {
@@ -478,6 +561,7 @@ const PageView = (function() {
         getCurrentPageTitle: getCurrentPageTitle,
         getPages: getPages,
         renderHeader: renderHeader,
+        renderMain: renderMain,
         renderFooter: renderFooter
     }
 })()
@@ -535,6 +619,7 @@ const ToDoApp = (function() {
         console.log(Database.getDatabase('todos'))
         PageView.load(appPages)
         container.appendChild(PageView.renderHeader())
+        container.appendChild(PageView.renderMain())
         container.appendChild(PageView.renderFooter())
     }
 
