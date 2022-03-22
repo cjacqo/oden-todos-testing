@@ -298,9 +298,6 @@ const ActionsController = (function() {
                         const value  = e.target.value
                         const action = e.target.name
                         ModalsController.handleSelection(value, action)
-                        //@TEST
-                        // const createdObject = createItemObject(value)
-                        // Database.handleAction(createdObject, e)
                     })
                     return
                 case 'delete':
