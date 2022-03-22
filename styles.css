@@ -65,7 +65,7 @@ body {
 body {
     background-color: rgb(10, 9, 9);
     color: white;
-    font-family: sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 
 #content {
@@ -91,7 +91,7 @@ ul {
 }
 
 .page-title {
-    font-weight: bold;
+    font-weight: 700;
 }
 .text-item {
     align-self: flex-end;
