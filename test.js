@@ -13,16 +13,20 @@ function createClassNamesList(name, isFlex, isCol) {
     return arr
 }
 //          + TEST: Just used to add data to the database to test
-function createItemObject(value) {
+function createItemObject(data, value) {
+    let answerArr = []
+    data.forEach(el => {
+        answerArr.push({type: el.name, answer: el.value})
+    })
     switch(value) {
         case 'folder':
             return Folder('Folder Item Add Test')
         case 'todo':
-            return ToDo('ToDo Item Add Test', '11-1-2023', 1)
+            return ToDo(answerArr[0].answer, answerArr[1].answer, answerArr[2].answer)
         case 'note':
-            return Note('Note Item Add Test', 'This is the text of the note')
+            return Note(answerArr[0].answer, answerArr[1].answer)
         case 'checklist':
-            return CheckList('Checklist Item Add Test')
+            return CheckList(answerArr[0].answer, answerArr[1].answer)
     }
 }
 
@@ -44,7 +48,7 @@ const ToDo = (title, duedate, num) => {
     const getInputConfig = () => {
         let temp = Item().inputConfig
         temp.duedate  = {type: 'date'}
-        temp.priority = {type: 'checkbox', options: _priority}
+        temp.priority = {type: 'radio', options: _priority}
         return temp
     }
     return {getTitle, getDueDate, getPriority, getInputConfig}
@@ -357,19 +361,18 @@ const ModalsController = (function() {
 
             if (value.options) {
                 value.options.forEach(option => {
-                    console.log(option)
-                    let tempLabel = label
-                    let tempInput = input
-                    tempLabel.setAttribute('for', value.option)
-                    tempInput.setAttribute('type', value.type)
-                    tempInput.setAttribute('value', option)
-                    tempInput.setAttribute('name', key)
-                    tempLabel.innerHTML = key
-                    tempInput.addEventListener('click', (e) => {
+                    const lab = document.createElement('label')
+                    const inp = document.createElement('input')
+                    lab.setAttribute('for', option)
+                    inp.setAttribute('type', value.type)
+                    inp.setAttribute('value', option)
+                    inp.setAttribute('name', key)
+                    lab.innerText = option.charAt(0).toUpperCase() + option.slice(1)
+                    inp.addEventListener('click', (e) => {
                         e.stopPropagation()
                     })
-                    container.appendChild(tempLabel)
-                    container.appendChild(tempInput)
+                    container.appendChild(lab)
+                    container.appendChild(inp)
                 })
             } else {
                 let tempLabel = label
@@ -377,18 +380,34 @@ const ModalsController = (function() {
                 tempLabel.setAttribute('for', key)
                 tempInput.setAttribute('type', value.type)
                 tempInput.setAttribute('name', key)
-                tempLabel.innerText = key
+                tempLabel.innerText = key.charAt(0).toUpperCase() + key.slice(1)
                 tempInput.addEventListener('click', (e) => {
                     e.stopPropagation()
                 })
                 container.appendChild(tempLabel)
                 container.appendChild(tempInput)
             }
-            container.classList.add(`form-control` ,`${className}-form-control`)
+            container.classList.add(`form-control` ,`${className}-form-control`, 'flex', 'col')
             input.classList.add(`modal-input`, `${className}-input`)
             input.setAttribute('type', `${value.type}`)
             formControlArr.push(container)
         }
+        const container   = document.createElement('div')
+        const button = document.createElement('button')
+        container.classList.add(`form-control` ,`${className}-form-control`, 'flex', 'col')
+        button.setAttribute('type', 'submit')
+        button.setAttribute('name', 'add')
+        button.setAttribute('value', className)
+        button.classList.add('submit-form-button')
+        button.innerText = `Add ${className.charAt(0).toUpperCase() + className.slice(1)}`
+        button.addEventListener('click', (e) => {
+            e.preventDefault()
+            const allInputs = document.querySelectorAll('input')
+            const itemObj   = createItemObject(allInputs, className)
+            Database.handleAction(itemObj, e)
+        })
+        container.appendChild(button)
+        formControlArr.push(container)
         return formControlArr
     }
 
