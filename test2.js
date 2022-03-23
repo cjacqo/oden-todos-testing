@@ -293,23 +293,21 @@ const EventsController = (function() {
         let header = PageView.renderHeader()
         let footer = PageView.renderFooter()
         let ulList = PageView.renderMain()
-        if (scroll >= 105) {
+        if (scroll >= 115) {
             ulList.classList.add('translate-up')
-        }
-        if (scroll >= 160) {
             header.classList.add('glass-bg')
-        } 
+        }
+        
         if (scroll > 2200) {
             footer.classList.remove('glass-bg')
-        }
-        if (scroll < 160) {
-            header.classList.remove('glass-bg')
         }
         if (scroll < 2200) {
             footer.classList.add('glass-bg')
         }
-        if (scroll < 105) {
+        if (scroll < 115) {
             ulList.classList.remove('translate-up')
+            header.classList.remove('glass-bg')
+
         }
     }
 
