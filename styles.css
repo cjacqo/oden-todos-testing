@@ -116,24 +116,32 @@ footer {
 
 .searchbar-container {
     position: fixed;
-    width: 100%;
+    width: calc(100vw - (1.15rem * 2));
     height: 35px;
     overflow: hidden;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 1.2rem;
+    transition: height 150ms ease-in;
+}
+.searchbar-container.shrink-height {
+    height: 0;
 }
 .searchbar-container > i {
-    margin: 0 5px;
-    position: relative;
+    position: absolute;
+}
+.searchbar-container > i:nth-child(1) {
+    left: 10px;
+}
+.searchbar-container > i:nth-child(3) {
+    right: 10px;
 }
 #searchInput {
-    position: fixed;
     top: 0;
-    left: 1.15rem;
-    right: 1.15rem;
+    right: 0;
     height: 35px;
+    width: 100%;
     background-color: var(--grey-bg);
     color: var(--grey-text);
     border-radius: 7px;
