@@ -13,7 +13,7 @@
     /* COLORS */
     --white: rgb(255, 250, 255);
     --black: rgb(26, 23, 23);
-    --grey-bg: rgb(37, 37, 37);
+    --grey-bg: rgba(59, 58, 58, 0.932);
     --grey-text: rgb(224, 224, 224);
     --blue: rgb(34, 116, 165);
     --yellow-1: rgb(246, 174, 45);
