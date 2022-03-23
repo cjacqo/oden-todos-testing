@@ -312,7 +312,7 @@ const EventsController = (function() {
             ulList.classList.remove('translate-up')
             header.classList.remove('glass-bg')
         }
-        if (scroll <= 10) {
+        if (scroll <= 1) {
             searchBar.classList.remove('shrink-height')
         }
     }
