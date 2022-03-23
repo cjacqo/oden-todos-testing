@@ -5,7 +5,7 @@
     right: 0;
     height: var(--xx-large);
     z-index: 2;
-    border: 1px solid rgba(165, 165, 165, 0.12);
+    /* border: 1px solid rgba(165, 165, 165, 0.12); */
     transition: background-color 220ms ease-in-out
 }
 .header-container {
@@ -18,7 +18,7 @@
 .glass-bg {
     /* From https://css.glass */
     background: rgba(165, 165, 165, 0.42);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.41);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(9.5px);
     -webkit-backdrop-filter: blur(9.5px);
 }

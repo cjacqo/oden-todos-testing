@@ -48,7 +48,7 @@ const ItemInputs = (type, properties) => {
     const getType = () => {return type}
     return {getType, getInputs}
 }
-// --- Database Obj
+// --- Database Objects
 const DatabaseItem = (type, data) => {
     const getType = () => {return type}
     const getTitle = () => {return data.title}
@@ -325,6 +325,7 @@ const PageView = (function() {
     let _previousePageTitle
     let _header
     let _main
+    let _currentTable
     let _footer
     let _modal
 
@@ -389,13 +390,6 @@ const PageView = (function() {
     //                  | --> navigation string (Folder > 'Folder Name')
     //                  | --> edit table button
     const _HeaderView = (function() {
-        let _title
-        let _backNavTitle
-        let _editToggler
-        let _titleElement
-        let _navTitleElement
-        let _header
-
         function _createHeaderElement() {
             // --- create the parent container
             const header = document.createElement('header')
@@ -411,29 +405,6 @@ const PageView = (function() {
                 header.appendChild(_navTitleElement)
             }
             _header = header
-
-        //     // TEST @@@
-        //     let count = 0
-        //     _pages.forEach(p => {
-        //         let btn = document.createElement('button')
-        //         btn.setAttribute('id', `${p.page}`)
-        //         btn.setAttribute('value', `${count}`)
-        //         btn.setAttribute('name', `navigate`)
-        //         btn.setAttribute('type', `button`)
-        //         btn.innerText = p.page
-
-        //         btn.addEventListener('click', (e) => {
-        //             let navigateToIndex = EventsController.handleNavigate(e.target.value)
-        //             _currentPageTitle = _pages[navigateToIndex].page
-        //             _currentPageIndex = navigateToIndex
-        //             _HeaderView.renderHeader()
-        //             console.log(_currentPageIndex)
-        //         })
-        //         count++
-        //         header.appendChild(btn)
-        //     })
-            
-        //     _header = header
         }
 
         function _createTitleContainer() {
@@ -496,10 +467,7 @@ const PageView = (function() {
     // --- Main View
     //          + Handles the main content displayed on the page
     const _MainView = (function() {
-        let _currentPage
         let _tableElements = []
-        let _currentTable
-        let _main
 
         function _createDisplay() {
             const marginWrapper = _marginWrapper()
@@ -515,7 +483,7 @@ const PageView = (function() {
             const main = document.createElement('main')
             main.classList.add('main-container', 'flex', 'col')
             const table = _tableElements.filter(_tb => {
-                return _tb.id.includes(_currentPage)
+                return _tb.id.includes(_currentPageTitle)
             })
             _currentTable = table
             _main = main
@@ -539,7 +507,6 @@ const PageView = (function() {
         }
 
         function renderMain() {
-            _currentPage = getCurrentPageTitle()[0]
             _createTableElements()
             _createMainElement()
             _createDisplay()
@@ -558,7 +525,6 @@ const PageView = (function() {
     //                  | --> actions/buttons container
     //                  | --> count of items in database/folder
     const _FooterView = (function() {
-        let _footer
         let _actionsContainer
 
         function _createFooterElement() {
@@ -571,7 +537,6 @@ const PageView = (function() {
 
         function _createActionContainers(actions) {
             const actionsContainer = document.createElement('div')
-            console.log(getPages())
         }
         
         function renderFooter() {
