@@ -90,6 +90,11 @@ ul {
     overflow-y: scroll;
 }
 
+input {
+    border: none;
+    outline: none;
+}
+
 .page-title {
     font-weight: 700;
     font-size: 2.25rem;
@@ -102,6 +107,38 @@ header,
 .margin-wrapper,
 footer {
     padding: 0 1.15rem;
+}
+
+.margin-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.searchbar-container {
+    position: fixed;
+    width: 100%;
+    height: 35px;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+}
+.searchbar-container > i {
+    margin: 0 5px;
+    position: relative;
+}
+#searchInput {
+    position: fixed;
+    top: 0;
+    left: 1.15rem;
+    right: 1.15rem;
+    height: 35px;
+    background-color: var(--grey-bg);
+    color: var(--grey-text);
+    border-radius: 7px;
+    font-size: 1.2rem;
+    padding: 0 2.5rem;
 }
 
 /* === MODAL === */

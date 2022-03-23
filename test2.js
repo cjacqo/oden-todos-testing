@@ -311,9 +311,14 @@ const EventsController = (function() {
         }
     }
 
+    function handleSearch(text) {
+        console.log(text)
+    }
+    
     return {
         handleNavigate: handleNavigate,
-        handleScroll: handleScroll
+        handleScroll: handleScroll,
+        handleSearch: handleSearch
     }
 })()
 
@@ -475,6 +480,7 @@ const PageView = (function() {
                 e.stopPropagation()
                 EventsController.handleScroll(e.target.scrollTop)
             })
+            marginWrapper.appendChild(_createSearchBar())
             marginWrapper.appendChild(_currentTable[0])
             _main.appendChild(marginWrapper)
         }
@@ -504,6 +510,27 @@ const PageView = (function() {
             _tableElements.push(notesTable)
             _tableElements.push(checkListsTable)
             _tableElements.push(pinnedTable)
+        }
+
+        function _createSearchBar() {
+            const container = document.createElement('div')
+            const input = document.createElement('input')
+            const magnifyingGlass = document.createElement('i')
+            const microphone = document.createElement('i')
+            container.classList.add('searchbar-container')
+            magnifyingGlass.classList.add('fa-solid', 'fa-magnifying-glass')
+            microphone.classList.add('fa-solid', 'fa-microphone')
+            input.setAttribute('type', 'text')
+            input.setAttribute('id', 'searchInput')
+            input.setAttribute('placeholder', 'Search')
+            input.addEventListener('change', (e) => {
+                EventsController.handleSearch(e.target.value)
+            })
+            
+            container.appendChild(magnifyingGlass)
+            container.appendChild(input)
+            container.appendChild(microphone)
+            return container
         }
 
         function renderMain() {
@@ -536,6 +563,7 @@ const PageView = (function() {
         }
 
         function _createActionContainers(actions) {
+
             const actionsContainer = document.createElement('div')
         }
         
