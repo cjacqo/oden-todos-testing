@@ -294,7 +294,7 @@ const EventsController = (function() {
         let footer = PageView.renderFooter()
         let ulList = PageView.renderMain()
         let searchBar = document.querySelector('.searchbar-container')
-        if (scroll > 0 && scroll <= 20) {
+        if (scroll > 10) {
             searchBar.classList.add('shrink-height')
         }
         if (scroll >= 115) {
@@ -311,7 +311,9 @@ const EventsController = (function() {
         if (scroll < 115) {
             ulList.classList.remove('translate-up')
             header.classList.remove('glass-bg')
-
+        }
+        if (scroll <= 10) {
+            searchBar.classList.remove('shrink-height')
         }
     }
 
