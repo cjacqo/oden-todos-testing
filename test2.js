@@ -285,46 +285,73 @@ const DataController = (function() {
 })()
 // --- Events Controller
 const EventsController = (function() {
+    let header
+    let main
+    let footer
+    let tableList
+    let searchBar
+    let searchInput
+
     function handleNavigate(selectedIndex) {
         return selectedIndex
     }
 
-    function handleScroll(scroll) {
-        let content = document.getElementById('content')
-        let header = PageView.renderHeader()
-        let ulList = document.querySelector('.list-container')
+    function handleScroll() {
+        let tableListBound = tableList.children[0].childNodes[1].getBoundingClientRect()
         let pageTitleContainer = document.querySelector('.page-title-container')
-        
-        let ulListBound = ulList.children[0].childNodes[1].getBoundingClientRect()
-
-        // --- Shrink to hide the search bar; Remove top styling of the ulList
-        if (ulListBound.top <= 180 && content.classList.contains('default-view')) {
+        // --- Shrink to hide the search bar; Remove top styling of the tableList
+        if (tableListBound.top <= 180 && content.classList.contains('default-view')) {
             content.classList.remove('default-view')
             content.classList.add('state-2')
+
+            if (searchBar.classList.contains('shrink-rise-animation')) {
+                searchBar.classList.remove('shrink-rise-animation')
+                searchInput.value = ''
+                searchInput.blur()
+            }
         }
-        if (ulListBound.top <= 140 && content.classList.contains('state-2')) {
+        if (tableListBound.top <= 140 && content.classList.contains('state-2')) {
             content.classList.remove('state-2')
             content.classList.add('state-3')
+            console.log(pageTitleContainer)
             pageTitleContainer.classList.add('center-title')
             header.classList.add('glass-bg')
         }
-        if (ulListBound.bottom >= 90 && content.classList.contains('state-3')) {
+        if (tableListBound.bottom >= 90 && content.classList.contains('state-3')) {
             content.classList.remove('state-3')
             content.classList.add('state-2')
             pageTitleContainer.classList.remove('center-title')
             header.classList.remove('glass-bg')
         }
-        if (ulListBound.bottom >= 170 && content.classList.contains('state-2')) {
+        if (tableListBound.bottom >= 170 && content.classList.contains('state-2')) {
             content.classList.remove('state-2')
             content.classList.add('default-view')
         }
     }
 
+    document.body.addEventListener('click', (e) => {
+        const searchBar = document.querySelector('.searchbar-container')
+        if (searchBar.classList.contains('shrink-rise-animation')) {
+            searchBar.classList.toggle('shrink-rise-animation')
+        }
+    })
+
     function handleSearch(text) {
         console.log(text)
     }
+
+    function setElements(elements) {
+        content = document.getElementById('content')
+        header = elements._header
+        main = elements._main
+        footer = elements._footer
+        searchBar = elements._searchBar,
+        searchInput = elements._searchBar.children[1]
+        tableList = elements._currentTable
+    }
     
     return {
+        setElements: setElements,
         handleNavigate: handleNavigate,
         handleScroll: handleScroll,
         handleSearch: handleSearch
@@ -333,7 +360,49 @@ const EventsController = (function() {
 
 // VIEWS
 const PageView = (function() {
-    let _pages
+    // --- Pages
+    let _pages = [
+        {
+            page: 'folders',
+            actions: {
+                createFolder: true,
+                createItem: true,
+                toggleEditCells: 
+                [true, 'Cells display buttons to edit and drag/drop', {toggleEditFolderModal: true, dragDropFolders: true}],
+                search: true
+            }
+        },
+        {
+            page: 'subfolder',
+            actions: {
+                createItem: true,
+                toggleEditModal: 
+                [true, 'Edit the gallery view of subfolders'],
+                search: true,
+                backNavigation: true
+            }
+        },
+        {
+            page: 'selected-item',
+            actions: {
+                createItem: true,
+                markup: true,
+                toggleEditNoteModal: 
+                [true, 'Modal as icons and list with other actions on it', {scanItem: true, pinItem: true, lockItem: true, deleteItem: true, others: true}] ,
+                backNavigation: true
+            }
+        },
+        {
+            page: 'create-item',
+            actions: {
+                markup: true,
+                backNavigation: true,
+                // IF the item being created is a note...
+                toggleEditNoteView:
+                [true, 'IF the item being created is a note, a modal to toggle line-grids on page']
+            }
+        }
+    ]
     let _currentPageTitle
     let _currentPageIndex
     let _previousPageTitle
@@ -341,6 +410,7 @@ const PageView = (function() {
     let _main
     let _currentTable
     let _footer
+    let _searchBar
     let _modal
 
     const _marginWrapper = () => {
@@ -404,7 +474,10 @@ const PageView = (function() {
     //                  | --> navigation string (Folder > 'Folder Name')
     //                  | --> edit table button
     const _HeaderView = (function() {
+        let _header
+
         function _createHeaderElement() {
+            _handlePageTitle()
             // --- create the parent container
             const header = document.createElement('header')
             header.classList.add('header-container', 'flex')
@@ -434,7 +507,7 @@ const PageView = (function() {
 
                 header.appendChild(_navTitleElement)
             }
-            _header = header
+            return header
         }
 
         function _createTitleContainer() {
@@ -480,33 +553,30 @@ const PageView = (function() {
             }
         }
 
-        function renderHeader() {
-            _handlePageTitle()
-            _createHeaderElement()
-            return _header
-        }
-        
-        function getHeader()     {return _header}
+        function getHeader()     {return _header ? _header : _createHeaderElement()}
         function getEditButton() {return _editToggler}
 
         return {
-            renderHeader: renderHeader,
             getHeader: getHeader
         }
     })()
     // --- Main View
     //          + Handles the main content displayed on the page
     const _MainView = (function() {
+        let _main
         let _tableElements = []
+        let _currentTable
+        let _searchBar
 
-        function _createDisplay() {
+        function _createDisplay(_tableElements) {
             const marginWrapper = _marginWrapper()
             marginWrapper.addEventListener('scroll', (e) => {
                 e.stopPropagation()
                 EventsController.handleScroll(e.target.scrollTop)
             })
-            marginWrapper.appendChild(_createSearchBar())
-            marginWrapper.appendChild(_currentTable[0])
+            _currentTable = _tableElements[0]
+            marginWrapper.appendChild(_searchBar)
+            marginWrapper.appendChild(_currentTable)
             _main.appendChild(marginWrapper)
         }
         
@@ -523,18 +593,13 @@ const PageView = (function() {
         function _createTableElements() {
             const tempDataObjects = DataController.getTables()
             const {folders, todos, notes, checklists, pinned} = tempDataObjects
-
             let foldersTable = _ListContainer(folders, 'folders').getElement()
             let todosTable = _ListContainer(todos, 'todos').getElement()
             let notesTable = _ListContainer(notes, 'notes').getElement()
             let checkListsTable = _ListContainer(checklists, 'checklists').getElement()
             let pinnedTable = _ListContainer(pinned, 'pinned').getElement()
 
-            _tableElements.push(foldersTable)
-            _tableElements.push(todosTable)
-            _tableElements.push(notesTable)
-            _tableElements.push(checkListsTable)
-            _tableElements.push(pinnedTable)
+            return [foldersTable, todosTable, notesTable, checkListsTable, pinnedTable]
         }
 
         function _createSearchBar() {
@@ -549,6 +614,7 @@ const PageView = (function() {
             input.setAttribute('id', 'searchInput')
             input.setAttribute('placeholder', 'Search')
             container.addEventListener('click', (e) => {
+                e.stopPropagation(false)
                 container.classList.toggle('shrink-rise-animation')
             })
             input.addEventListener('change', (e) => {
@@ -558,21 +624,29 @@ const PageView = (function() {
             container.appendChild(magnifyingGlass)
             container.appendChild(input)
             container.appendChild(microphone)
-            return container
+            
+            _searchBar = container
         }
 
         function renderMain() {
-            _createTableElements()
+            _tableElements = _createTableElements()
             _createMainElement()
-            _createDisplay()
+            _createSearchBar()
+            _createDisplay(_tableElements)
             return _main
         }
-        
-        function getMain() {return _main}
+
+        function getMain() {return _main ? _main : _createMainElement()}
+        function getSearchBar() {return _searchBar ? _searchBar : _createSearchBar()}
+        function getTableElements() {return _tableElements ? _tableElements : _createTableElements}
+        function getCurrentTable() {return _currentTable ? _currentTable : 'no table selected'}
 
         return {
             renderMain: renderMain,
-            getMain: getMain
+            getMain: getMain,
+            getSearchBar: getSearchBar,
+            getTableElements: getTableElements,
+            getCurrentTable: getCurrentTable
         }
     })()
     // --- Footer View
@@ -587,38 +661,38 @@ const PageView = (function() {
             const footer = document.createElement('footer')
             footer.classList.add('footer-container', 'flex', 'glass-bg')
             // _createActionContainers()
-            _footer = footer
+            return footer
         }
 
         function _createActionContainers(actions) {
-
             const actionsContainer = document.createElement('div')
         }
         
-        function renderFooter() {
-            _createFooterElement()
-            return _footer
-        }
-
-        function getFooter() {return _footer}
+        function getFooter() {return _footer ? _footer : _createFooterElement()}
 
         return {
-            renderFooter: renderFooter,
             getFooter: getFooter
         }
     })()
 
-    function _init() {
-        _header = _HeaderView.renderHeader()
-        _main   = _MainView.renderMain()
-        _footer = _FooterView.renderFooter()
-    }
-
-    function load(pages) {
-        _pages = pages
+    const _init = (function() {
         _currentPageIndex = 0
-        _init()
-    }
+        _header = _HeaderView.getHeader()
+        _main   = _MainView.renderMain()
+        _footer = _FooterView.getFooter()
+        _searchBar = _MainView.getSearchBar()
+        _tableElements = _MainView.getTableElements()
+        _currentTable = _MainView.getCurrentTable()
+
+        const elementObj = {
+            _header,
+            _main,
+            _footer,
+            _searchBar,
+            _currentTable
+        }
+        EventsController.setElements(elementObj)
+    })()
 
     function getCurrentPageTitle() {
         _currentPageTitle = (_pages[_currentPageIndex].page)
@@ -630,74 +704,31 @@ const PageView = (function() {
         return [_currentPageTitle, _previousPageTitle]
     }
     function getPages() {return _pages}
-    function renderHeader() {return _header}
+    function getHeader() {return _header}
     function renderMain() {return _main}
     function renderFooter() {return _footer}
+    function renderCurrentTable() {return _currentTable}
+    function renderSearchBar() {return _searchBar}
 
     return {
-        load: load,
         getCurrentPageTitle: getCurrentPageTitle,
         getPages: getPages,
-        renderHeader: renderHeader,
+        getHeader: getHeader,
         renderMain: renderMain,
-        renderFooter: renderFooter
+        renderFooter: renderFooter,
+        renderCurrentTable: renderCurrentTable,
+        renderSearchBar: renderSearchBar
     }
 })()
 
 // MAIN IIFE FOR APP START
 const ToDoApp = (function() {
-    // --- Pages
-    const appPages = [
-        {
-            page: 'folders',
-            actions: {
-                createFolder: true,
-                createItem: true,
-                toggleEditCells: 
-                [true, 'Cells display buttons to edit and drag/drop', {toggleEditFolderModal: true, dragDropFolders: true}],
-                search: true
-            }
-        },
-        {
-            page: 'subfolder',
-            actions: {
-                createItem: true,
-                toggleEditModal: 
-                [true, 'Edit the gallery view of subfolders'],
-                search: true,
-                backNavigation: true
-            }
-        },
-        {
-            page: 'selected-item',
-            actions: {
-                createItem: true,
-                markup: true,
-                toggleEditNoteModal: 
-                [true, 'Modal as icons and list with other actions on it', {scanItem: true, pinItem: true, lockItem: true, deleteItem: true, others: true}] ,
-                backNavigation: true
-            }
-        },
-        {
-            page: 'create-item',
-            actions: {
-                markup: true,
-                backNavigation: true,
-                // IF the item being created is a note...
-                toggleEditNoteView:
-                [true, 'IF the item being created is a note, a modal to toggle line-grids on page']
-            }
-        }
-    ]
     const container = document.getElementById('content')
     container.classList.add('default-view')
 
     function start() {
         Database.getObjectInputModels()
-        console.log(Database.getFolders())
-        console.log(Database.getDatabase('todos'))
-        PageView.load(appPages)
-        container.appendChild(PageView.renderHeader())
+        container.appendChild(PageView.getHeader())
         container.appendChild(PageView.renderMain())
         container.appendChild(PageView.renderFooter())
     }
