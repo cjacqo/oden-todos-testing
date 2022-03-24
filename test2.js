@@ -292,20 +292,11 @@ const EventsController = (function() {
     function handleScroll(scroll) {
         let content = document.getElementById('content')
         let header = PageView.renderHeader()
-        let main = PageView.renderMain()
-        let footer = PageView.renderFooter()
         let ulList = document.querySelector('.list-container')
-        let searchBar = document.querySelector('.searchbar-container')
         let pageTitleContainer = document.querySelector('.page-title-container')
         
-        let headerBound = header.getBoundingClientRect()
         let ulListBound = ulList.children[0].childNodes[1].getBoundingClientRect()
-        let searchBound = searchBar.getBoundingClientRect()
-        let { hY, hTop, bBottom } = headerBound
-        let { ulY, ulTop, ulBottom } = ulListBound
-        let { sY, sTop, sBottom } = searchBound
 
-        console.log(ulListBound.bottom)
         // --- Shrink to hide the search bar; Remove top styling of the ulList
         if (ulListBound.top <= 180 && content.classList.contains('default-view')) {
             content.classList.remove('default-view')
@@ -327,45 +318,6 @@ const EventsController = (function() {
             content.classList.remove('state-2')
             content.classList.add('default-view')
         }
-
-        // --- Shrink to hide the search bar; Remove top styling of the ulList
-        // if (ulListBound.top <= 172) {
-        //     searchBar.classList.add('shrink-height')
-        //     ulList.classList.remove('default-view')
-        //     ulList.classList.add('remove-top')
-        //     console.log(searchBound.bottom)
-        // }
-        // // --- Update the header styles
-        // if (ulListBound.top <= 140) {
-        //     header.classList.add('hide')
-        //     main.classList.add('place-at-top')
-
-        //     if (pageTitleContainer.style.opacity == 0) {
-        //         pageTitleContainer.classList.remove('hide-default')
-        //         pageTitleContainer.classList.add('center-title')
-        //         header.classList.add('glass-bg')
-        //     }
-        // }
-        // if (ulListBound.top >= 82) {
-        //     header.classList.remove('hide')
-        //     main.classList.remove('place-at-top')
-        //     pageTitleContainer.classList.add('hide-default')
-        //     pageTitleContainer.classList.remove('center-title')
-        //     header.classList.remove('glass-bg')   
-        // }
-        // if (ulListBound.top >= 141) {
-        //     searchBar.classList.remove('shrink-height')
-        //     ulList.classList.add('default-view')
-        //     ulList.classList.remove('remove-top')
-        // }
-        // --- Set layout to default
-        console.log(ulListBound.top)
-        if (ulListBound.top > 172) {
-            searchBar.classList.remove('shrink-height')
-            ulList.classList.remove('remove-top')
-            ulList.classList.add('default-view')
-        }
-
     }
 
     function handleSearch(text) {

@@ -17,9 +17,6 @@
 .page-title-container {
     opacity: 1;
 }
-.center-title {
-    
-}
 .state-3 > .header-container > .page-title-container.center-title {
     position: absolute;
     top: 50%;
@@ -35,6 +32,10 @@
     100% {
         opacity: 1;
     }
+}
+.header-container > .edit-button-container {
+    position: absolute;
+    right: 20px;
 }
 .footer-container {
     bottom: 0;
