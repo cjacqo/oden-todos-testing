@@ -9,9 +9,39 @@
 }
 .header-container {
     top: 0;
+    justify-content: space-between;
+}
+.state-3 > .header-container {
+    height: var(--x-large);
+}
+.page-title-container {
+    opacity: 1;
+}
+.center-title {
+    
+}
+.state-3 > .header-container > .page-title-container.center-title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: opacityAnimation 1500ms ease-in 300ms 1 forwards;
+}
+@keyframes opacityAnimation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 .footer-container {
     bottom: 0;
+}
+
+.page-title-container {
+    align-self: flex-end;
 }
 
 .glass-bg {

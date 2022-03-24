@@ -290,31 +290,82 @@ const EventsController = (function() {
     }
 
     function handleScroll(scroll) {
+        let content = document.getElementById('content')
         let header = PageView.renderHeader()
+        let main = PageView.renderMain()
         let footer = PageView.renderFooter()
-        let ulList = PageView.renderMain()
+        let ulList = document.querySelector('.list-container')
         let searchBar = document.querySelector('.searchbar-container')
-        if (scroll > 10) {
-            searchBar.classList.add('shrink-height')
+        let pageTitleContainer = document.querySelector('.page-title-container')
+        
+        let headerBound = header.getBoundingClientRect()
+        let ulListBound = ulList.children[0].childNodes[1].getBoundingClientRect()
+        let searchBound = searchBar.getBoundingClientRect()
+        let { hY, hTop, bBottom } = headerBound
+        let { ulY, ulTop, ulBottom } = ulListBound
+        let { sY, sTop, sBottom } = searchBound
+
+        console.log(ulListBound.bottom)
+        // --- Shrink to hide the search bar; Remove top styling of the ulList
+        if (ulListBound.top <= 180 && content.classList.contains('default-view')) {
+            content.classList.remove('default-view')
+            content.classList.add('state-2')
         }
-        if (scroll >= 115) {
-            ulList.classList.add('translate-up')
+        if (ulListBound.top <= 140 && content.classList.contains('state-2')) {
+            content.classList.remove('state-2')
+            content.classList.add('state-3')
+            pageTitleContainer.classList.add('center-title')
             header.classList.add('glass-bg')
         }
-        
-        if (scroll > 2200) {
-            footer.classList.remove('glass-bg')
-        }
-        if (scroll < 2200) {
-            footer.classList.add('glass-bg')
-        }
-        if (scroll < 115) {
-            ulList.classList.remove('translate-up')
+        if (ulListBound.bottom >= 90 && content.classList.contains('state-3')) {
+            content.classList.remove('state-3')
+            content.classList.add('state-2')
+            pageTitleContainer.classList.remove('center-title')
             header.classList.remove('glass-bg')
         }
-        if (scroll <= 1) {
-            searchBar.classList.remove('shrink-height')
+        if (ulListBound.bottom >= 170 && content.classList.contains('state-2')) {
+            content.classList.remove('state-2')
+            content.classList.add('default-view')
         }
+
+        // --- Shrink to hide the search bar; Remove top styling of the ulList
+        // if (ulListBound.top <= 172) {
+        //     searchBar.classList.add('shrink-height')
+        //     ulList.classList.remove('default-view')
+        //     ulList.classList.add('remove-top')
+        //     console.log(searchBound.bottom)
+        // }
+        // // --- Update the header styles
+        // if (ulListBound.top <= 140) {
+        //     header.classList.add('hide')
+        //     main.classList.add('place-at-top')
+
+        //     if (pageTitleContainer.style.opacity == 0) {
+        //         pageTitleContainer.classList.remove('hide-default')
+        //         pageTitleContainer.classList.add('center-title')
+        //         header.classList.add('glass-bg')
+        //     }
+        // }
+        // if (ulListBound.top >= 82) {
+        //     header.classList.remove('hide')
+        //     main.classList.remove('place-at-top')
+        //     pageTitleContainer.classList.add('hide-default')
+        //     pageTitleContainer.classList.remove('center-title')
+        //     header.classList.remove('glass-bg')   
+        // }
+        // if (ulListBound.top >= 141) {
+        //     searchBar.classList.remove('shrink-height')
+        //     ulList.classList.add('default-view')
+        //     ulList.classList.remove('remove-top')
+        // }
+        // --- Set layout to default
+        console.log(ulListBound.top)
+        if (ulListBound.top > 172) {
+            searchBar.classList.remove('shrink-height')
+            ulList.classList.remove('remove-top')
+            ulList.classList.add('default-view')
+        }
+
     }
 
     function handleSearch(text) {
@@ -333,7 +384,7 @@ const PageView = (function() {
     let _pages
     let _currentPageTitle
     let _currentPageIndex
-    let _previousePageTitle
+    let _previousPageTitle
     let _header
     let _main
     let _currentTable
@@ -384,7 +435,7 @@ const PageView = (function() {
         const getData = () => {return table}
         const getElement = () => {
             const ul = document.createElement('ul')
-            ul.classList.add('list-container')
+            ul.classList.add('list-container', 'default-view')
             ul.setAttribute('id', `${id}Table`)
             table.forEach(item => {
                 let li = _ListItem(item).getElement()
@@ -405,11 +456,27 @@ const PageView = (function() {
             // --- create the parent container
             const header = document.createElement('header')
             header.classList.add('header-container', 'flex')
-            // --- create two elements
+            // --- create two containers
+            const titleContainer = document.createElement('div')
+            const editButtonContainer = document.createElement('div')
+            // --- create three elements
             //          1) the page title text element
+            //          2) the edit button
             //          2) the back button navigation from previous page title (default class of hidden)
             _titleElement = _createTitleContainer()
-            header.appendChild(_titleElement)
+            _editButton = document.createElement('button')
+            // --- add class names
+            titleContainer.classList.add('page-title-container', 'header-child-container')
+            editButtonContainer.classList.add('edit-button-container', 'header-child-container')
+            _editButton.classList.add('btn', 'accent-text')
+            // --- add content to elements
+            _titleElement.innerText = _currentPageTitle.charAt(0).toUpperCase() + _currentPageTitle.slice(1)
+            _editButton.innerText = 'Edit'
+            // --- append elements to their containers
+            titleContainer.appendChild(_titleElement)
+            editButtonContainer.appendChild(_editButton)
+            header.appendChild(titleContainer)
+            header.appendChild(editButtonContainer)
             if (_currentPageIndex > 0 && _currentPageIndex < _pages.length) {
                 _navTitleElement = _createTitleContainer()
 
@@ -432,7 +499,7 @@ const PageView = (function() {
             container.classList.add('navigation-title-container')
             const textEl = textBox('h1', 'navigation-title', 'inactive')
 
-            textEl.innerHTML = _previousePageTitle
+            textEl.innerHTML = _previousPageTitle
             return textEl
         }
 
@@ -493,7 +560,7 @@ const PageView = (function() {
         
         function _createMainElement() {
             const main = document.createElement('main')
-            main.classList.add('main-container', 'flex', 'col')
+            main.classList.add('main-container', 'main-table-container', 'flex', 'col')
             const table = _tableElements.filter(_tb => {
                 return _tb.id.includes(_currentPageTitle)
             })
@@ -529,6 +596,9 @@ const PageView = (function() {
             input.setAttribute('type', 'text')
             input.setAttribute('id', 'searchInput')
             input.setAttribute('placeholder', 'Search')
+            container.addEventListener('click', (e) => {
+                container.classList.toggle('shrink-rise-animation')
+            })
             input.addEventListener('change', (e) => {
                 EventsController.handleSearch(e.target.value)
             })
@@ -601,11 +671,11 @@ const PageView = (function() {
     function getCurrentPageTitle() {
         _currentPageTitle = (_pages[_currentPageIndex].page)
         if (_currentPageIndex > 0) {
-            _previousePageTitle = (_pages[_currentPageIndex - 1].page)
+            _previousPageTitle = (_pages[_currentPageIndex - 1].page)
         } else {
-            _previousePageTitle = ''
+            _previousPageTitle = ''
         }
-        return [_currentPageTitle, _previousePageTitle]
+        return [_currentPageTitle, _previousPageTitle]
     }
     function getPages() {return _pages}
     function renderHeader() {return _header}
@@ -668,6 +738,7 @@ const ToDoApp = (function() {
         }
     ]
     const container = document.getElementById('content')
+    container.classList.add('default-view')
 
     function start() {
         Database.getObjectInputModels()

@@ -6,10 +6,7 @@
     width: 100%;
     height: calc(95vh - (var(--xx-large)));
     transition: top 300ms ease-in-out;
-}
-
-.main-container.translate-up {
-    top: 50%;
+    overflow-y: scroll;
 }
 
 .main-container .margin-wrapper {
@@ -26,7 +23,24 @@
     border-radius: 8px 8px 0 0;
     overflow: hidden;
     line-height: 100%;
-    margin-top: 5.5rem;
+}
+.list-container.default-view {
+    transform: translateY(5.5rem);
+}
+
+.state-2 > .main-table-container > div > .list-container {
+    transform: translateY(55px);
+    transition: transform 300ms ease-in;
+}
+.state-3 > .main-table-container {
+    top: 50%;
+}
+.state-3 > .main-table-container > div > .list-container {
+    transform: translateY(105px);
+    transition: transform 300ms ease-in;
+}
+.state-3 > .main-table-container > div > .searchbar-container {
+    display: none;
 }
 
 .list-container > * {

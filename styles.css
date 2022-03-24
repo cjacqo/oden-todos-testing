@@ -56,6 +56,10 @@
     padding: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 html,
 body {
     font-size: 14px;
@@ -90,9 +94,19 @@ ul {
     overflow-y: scroll;
 }
 
+button {
+    background-color: transparent;
+    border: none;
+}
+
 input {
     border: none;
     outline: none;
+}
+
+input[type='text'] {
+    caret-color: var(--yellow-2);
+    color: var(--white);
 }
 
 .page-title {
@@ -107,6 +121,7 @@ header,
 .margin-wrapper,
 footer {
     padding: 0 1.15rem;
+    overflow: hidden;
 }
 
 .margin-wrapper {
@@ -124,13 +139,17 @@ footer {
     align-items: center;
     font-size: 1.2rem;
     transform: scaleY(1);
-    transition: height 100ms ease, transform 150ms ease;
+    transition: height 100ms ease, transform 100ms ease, width 100ms ease-in-out;
     color: var(--grey-text);
 }
-.searchbar-container.shrink-height {
+.state-2 > .main-table-container > div > .searchbar-container {
     transform: scaleY(0);
     height: 0;
+}
 
+
+.searchbar-container.shrink-rise-animation {
+    width: calc(100vw - (3.45rem * 2));
 }
 .searchbar-container > i {
     position: absolute;
