@@ -1,0 +1,11 @@
+.actions-container {
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+}
+.footer-item-container > * {
+    font-size: 1.7rem;
+}
+.footer-item-cotainer > i:nth-child(2) {
+    font-weight: unset;
+}

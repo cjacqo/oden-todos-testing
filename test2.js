@@ -351,12 +351,22 @@ const EventsController = (function() {
         searchInput = elements._searchBar.children[1]
         tableList = elements._currentTable
     }
+
+    // --- Handle Drop Down Toggle
+    function handleDropDown(e) {
+        let value = e.target.value
+        
+        if (value.includes('item')) {
+            console.log("HIHI")
+        }
+    }
     
     return {
         setElements: setElements,
         handleNavigate: handleNavigate,
         handleScroll: handleScroll,
-        handleSearch: handleSearch
+        handleSearch: handleSearch,
+        handleDropDown: handleDropDown
     }
 })()
 
@@ -657,23 +667,94 @@ const PageView = (function() {
     //                  | --> count of items in database/folder
     const _FooterView = (function() {
         let _actionsContainer
+        let _buttons = [
+            {
+                name: 'create-folder',
+                icon: 'fa-folder-plus'
+            },
+            {
+                name: 'create-item',
+                icon: 'fa-pen-to-square'
+            }
+        ]
+        let _menus = [
+            [{
+                name: 'new-smart-folder',
+                icon: 'fa-cog'
+            },
+            {
+                name: 'new-folder',
+                icon: 'fa-folder'
+            }],
+            [{
+                name: 'new-note',
+                icon: 'fa-paper'
+            },
+            {
+                name: 'new-todo',
+                icon: 'fa-folder'
+            },
+            {
+                name: 'new-checklist',
+                icon: 'fa-folder'
+            }]
+        ]
+        let _buttonElements = []
 
         function _createFooterElement() {
             // --- create the parent container
             const footer = document.createElement('footer')
             footer.classList.add('footer-container', 'flex', 'glass-bg')
-            // _createActionContainers()
+            footer.appendChild(_createActionContainers())
             return footer
         }
 
-        function _createActionContainers(actions) {
+        function _createActionContainers() {
             const actionsContainer = document.createElement('div')
+            
+            _buttons.forEach(btn => {
+                const container = document.createElement('div')
+                const icon = document.createElement('button')
+                container.classList.add('footer-item-container')
+                icon.classList.add('fa-solid', `${btn.icon}`, 'accent-text')
+                icon.setAttribute('value', `${btn.name}`)
+
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                    EventsController.handleDropDown(e)
+                })
+
+                container.appendChild(icon)
+                actionsContainer.appendChild(container)
+                _buttonElements.push(icon)
+            })
+            actionsContainer.classList.add('actions-container', 'flex')
+            _actionsContainer = actionsContainer
+            return actionsContainer
         }
         
+        function _createDropDownContainers() {
+            const container = document.createElement('div')
+            container.classList.add('drop-down-container', 'hidden')
+            _menus.forEach(menu => {
+                const menuContainer = document.createElement('div')
+                menu.forEach(item => {
+                    const menuItem = document.createElement('div')
+                    menuItem.classList.add('drop-down-menu-item', `${menu.name}`)
+                    menuItem.innerText = menu.name
+                    menuContainer.appendChild(menuItem)
+                })
+                container.appendChild(menuContainer)
+            })
+            return container
+        }
+
         function getFooter() {return _footer ? _footer : _createFooterElement()}
+        function getButtons() {return _buttonElements ? _buttonElements : _createActionContainers()}
 
         return {
-            getFooter: getFooter
+            getFooter: getFooter,
+            getButtons: getButtons
         }
     })()
 
