@@ -296,6 +296,7 @@ const EventsController = (function() {
         return selectedIndex
     }
 
+    // --- Handles animation toggling based on the lists Y position
     function handleScroll() {
         let tableListBound = tableList.children[0].childNodes[1].getBoundingClientRect()
         let pageTitleContainer = document.querySelector('.page-title-container')
@@ -313,7 +314,6 @@ const EventsController = (function() {
         if (tableListBound.top <= 140 && content.classList.contains('state-2')) {
             content.classList.remove('state-2')
             content.classList.add('state-3')
-            console.log(pageTitleContainer)
             pageTitleContainer.classList.add('center-title')
             header.classList.add('glass-bg')
         }
@@ -329,8 +329,9 @@ const EventsController = (function() {
         }
     }
 
+    // --- Window click to remove 'active' states of elements
     document.body.addEventListener('click', (e) => {
-        const searchBar = document.querySelector('.searchbar-container')
+        // - toggle search bar with back to full
         if (searchBar.classList.contains('shrink-rise-animation')) {
             searchBar.classList.toggle('shrink-rise-animation')
         }
@@ -340,6 +341,7 @@ const EventsController = (function() {
         console.log(text)
     }
 
+    // --- Called in PageView init IIFE
     function setElements(elements) {
         content = document.getElementById('content')
         header = elements._header
@@ -706,18 +708,14 @@ const PageView = (function() {
     function getPages() {return _pages}
     function getHeader() {return _header}
     function renderMain() {return _main}
-    function renderFooter() {return _footer}
-    function renderCurrentTable() {return _currentTable}
-    function renderSearchBar() {return _searchBar}
+    function getFooter() {return _footer}
 
     return {
         getCurrentPageTitle: getCurrentPageTitle,
         getPages: getPages,
         getHeader: getHeader,
         renderMain: renderMain,
-        renderFooter: renderFooter,
-        renderCurrentTable: renderCurrentTable,
-        renderSearchBar: renderSearchBar
+        getFooter: getFooter
     }
 })()
 
@@ -730,7 +728,7 @@ const ToDoApp = (function() {
         Database.getObjectInputModels()
         container.appendChild(PageView.getHeader())
         container.appendChild(PageView.renderMain())
-        container.appendChild(PageView.renderFooter())
+        container.appendChild(PageView.getFooter())
     }
 
     return {
